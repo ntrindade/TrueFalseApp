@@ -12,13 +12,16 @@ import GameKit
 class ViewController: UIViewController {
     
     let questionsPerGame = 10
-    let questionModel: QuestionModel = QuestionModel()
+    let questionModel = QuestionModel()
     let randomNumberModel = RandomNumberModel()
+    let colorModel = ColorModel()
     
     var soundModel = SoundModel()
-    var gameModel: GameModel = GameModel()
-    
+    var gameModel = GameModel()
+
     var gameQuestions: [Question] = []
+    
+    var timeoutBlocker: dispatch_block_t?
     
     @IBOutlet weak var labelQuestion: UILabel!
     @IBOutlet weak var labelResult: UILabel!
@@ -30,6 +33,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        soundModel.loadGameSounds()
         startGame()
     }
 
@@ -44,36 +49,49 @@ class ViewController: UIViewController {
         
         if sender.currentTitle == correctAnswer?.text {
             
+            setUIForCorrectAnswer(messageToUser: "Correct!")
             gameModel.correctQuestions += 1
-            labelResult.text = "Correct!"
-            labelResult.textColor = gameModel.correctAnswerColor
-            soundModel.playCorrectSound()
+            
+        } else if sender === buttonNextAction {
+            
+            setUIForIncorrectAnswer(messageToUser: "You need to be faster!")
+            
         } else {
         
-            labelResult.text = "Sorry, wrong answer!"
-            labelResult.textColor = gameModel.incorrectAnswerColor
-            soundModel.playIncorrectSound()
-        }
+            setUIForIncorrectAnswer(messageToUser: "Sorry, wrong answer!")
+            dispatch_block_cancel(timeoutBlocker!)
 
+        }
+        
+        // disable answer buttons and mark the correct one
+        disableAnswerButtons([buttonAnswer1, buttonAnswer2, buttonAnswer3, buttonAnswer4], answerButton: sender, correctAnswer: correctAnswer!)
+        
+        buttonNextAction.hidden = false
         gameQuestions.removeAtIndex(gameModel.indexOfSelectedQuestion)
-        loadNextRoundWithDelay(seconds: 2)
+        
+        dispatch_block_cancel(timeoutBlocker!)
     }
     
     @IBAction func nextAction(sender: UIButton) {
-        gameModel.correctQuestions = 0
-        startGame()
+        if buttonNextAction.currentTitle == gameModel.playAgainTitle {
+            startGame()
+        }
+        
+        if buttonNextAction.currentTitle == gameModel.nextQuestionTitle {
+            nextQuestion()
+        }
     }
    
     // Helper Methods
     func startGame() {
         
-        if buttonNextAction.currentTitle != gameModel.playAgainTitle {
-            soundModel.loadGameSounds()
-        }
-        
         soundModel.playGameStartSound()
+        
         gameModel.questionsPerGame = questionsPerGame
+        gameModel.correctQuestions = 0
+        
         gameQuestions = gameModel.getGameQuestions()
+        buttonNextAction.setTitle(gameModel.nextQuestionTitle, forState: UIControlState.Normal)
         
         displayQuestion()
     }
@@ -87,6 +105,11 @@ class ViewController: UIViewController {
     }
     
     func displayQuestion() {
+        
+        timeoutBlocker = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) {
+            self.checkAnswer(self.buttonNextAction)
+        }
+        
         gameModel.indexOfSelectedQuestion = randomNumberModel.getWithUpperBound(gameQuestions.count)
         let question = gameQuestions[gameModel.indexOfSelectedQuestion]
         
@@ -94,34 +117,32 @@ class ViewController: UIViewController {
         labelResult.text = ""
         
         if question.answers.count > 0 {
-            buttonAnswer1.setTitle(question.answers[0].text, forState: UIControlState.Normal)
-            buttonAnswer1.hidden = false
+            setButtonWithAnswer(buttonAnswer1, title: question.answers[0].text)
         } else {
             buttonAnswer1.hidden = true
         }
  
         if question.answers.count > 1 {
-            buttonAnswer2.setTitle(question.answers[1].text, forState: UIControlState.Normal)
-            buttonAnswer2.hidden = false
+            setButtonWithAnswer(buttonAnswer2, title: question.answers[1].text)
         } else {
             buttonAnswer2.hidden = true
         }
         
         if question.answers.count > 2 {
-            buttonAnswer3.setTitle(question.answers[2].text, forState: UIControlState.Normal)
-            buttonAnswer3.hidden = false
+            setButtonWithAnswer(buttonAnswer3, title: question.answers[2].text)
         } else {
             buttonAnswer3.hidden = true
         }
         
         if question.answers.count > 3 {
-            buttonAnswer4.setTitle(question.answers[3].text, forState: UIControlState.Normal)
-            buttonAnswer4.hidden = false
+            setButtonWithAnswer(buttonAnswer4, title: question.answers[3].text)
         } else {
             buttonAnswer4.hidden = true
         }
         
         buttonNextAction.hidden = true
+
+        timeoutQuestion(seconds: gameModel.timeoutQuestionInSeconds)
     }
     
     func displayScore() {
@@ -132,23 +153,57 @@ class ViewController: UIViewController {
         buttonAnswer4.hidden = true
         
         // Display play again button
-        buttonNextAction.hidden = false
         buttonNextAction.setTitle(gameModel.playAgainTitle, forState: UIControlState.Normal)
         
+        labelResult.text = String()
         labelQuestion.text = gameModel.getFinalScore(questionsPerGame)
-        labelResult.text = ""
     }   
-    
-    func loadNextRoundWithDelay(seconds seconds: Int) {
+
+    func timeoutQuestion(seconds seconds: Int) {
         // Converts a delay in seconds to nanoseconds as signed 64 bit integer
         let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
         // Calculates a time value to execute the method given current time and delay
         let dispatchTime = dispatch_time(DISPATCH_TIME_NOW, delay)
-
+        
         // Executes the nextRound method at the dispatch time on the main queue
-        dispatch_after(dispatchTime, dispatch_get_main_queue()) {
-            self.nextQuestion()
+        dispatch_after(dispatchTime, dispatch_get_main_queue(), timeoutBlocker!)
+    }
+
+    func disableAnswerButtons(buttons: [UIButton], answerButton: UIButton, correctAnswer: Answer){
+        for button in buttons {
+            button.enabled = false
+            button.backgroundColor = colorModel.disabledBackgroundColor
+            button.setTitleColor(colorModel.disabledTitleColor, forState: UIControlState.Normal)
+            
+            if button === answerButton
+            && button.currentTitle != correctAnswer.text {
+                button.setTitleColor(colorModel.incorrectTitleColor, forState: UIControlState.Normal)
+            }
+            
+            if button.currentTitle == correctAnswer.text {
+                button.setTitleColor(colorModel.correctTitleColor, forState: UIControlState.Normal)
+            }
         }
+    }
+    
+    func setButtonWithAnswer(button: UIButton, title: String) {
+        button.hidden = false
+        button.enabled = true
+        button.backgroundColor = colorModel.enabledBackgroundColor
+        button.setTitle(title, forState: UIControlState.Normal)
+        button.setTitleColor(colorModel.enabledTitleColor, forState: UIControlState.Normal)
+    }
+    
+    func setUIForCorrectAnswer(messageToUser message: String) {
+        labelResult.text = message
+        labelResult.textColor = colorModel.correctAnswerHeaderColor
+        soundModel.playCorrectSound()
+    }
+    
+    func setUIForIncorrectAnswer(messageToUser message: String) {
+        labelResult.text = message
+        labelResult.textColor = colorModel.incorrectAnswerHeaderColor
+        soundModel.playIncorrectSound()
     }
 }
 

@@ -5,29 +5,43 @@
 //  Created by Nuno Trindade on 19/08/16.
 //  Copyright © 2016 Treehouse. All rights reserved.
 //
-import UIKit
-
 struct GameModel {
     
     let questionModel = QuestionModel()
-    let correctAnswerColor = UIColor(red:0.37, green:0.62, blue:0.63, alpha:1.0)
-    let incorrectAnswerColor = UIColor(red:1.00, green:0.50, blue:0.31, alpha:1.0)
+    let randomNumberModel = RandomNumberModel()
+    
     let playAgainTitle = "Play again?"
+    let nextQuestionTitle = "Next Question"
+    
+    let timeoutQuestionInSeconds = 15
     
     var questionsPerGame = 0
     var correctQuestions = 0
     var indexOfSelectedQuestion = 0
     
     func getGameQuestions() -> [Question] {
-    
-        if questionsPerGame <= questionModel.fixedQuestions.count {
-            return Array(questionModel.fixedQuestions.prefix(questionsPerGame))
+        
+        // Divides the total number of questions evenly by 2 so it has similar number of fixed and random questions
+        let fixedQuestions = questionsPerGame / 2
+        let randomQuestions = questionsPerGame - fixedQuestions
+        var gameQuestions: [Question] = []
+        
+        // get fixed questions from array
+        var indexesAlreadyPicked: [Int] = []
+        for _ in 1...fixedQuestions {
+            var randomFixedQuestionIndex: Int
+            
+            // Randomly picks a unique index
+            repeat {
+                randomFixedQuestionIndex = randomNumberModel.getWithUpperBound(questionModel.fixedQuestions.count)
+            } while indexesAlreadyPicked.contains(randomFixedQuestionIndex)
+            indexesAlreadyPicked.append(randomFixedQuestionIndex)
+            
+            gameQuestions.append(questionModel.fixedQuestions[randomFixedQuestionIndex])
         }
         
-        var gameQuestions: [Question] = questionModel.fixedQuestions
-        let numberOfRandomQuestions = questionsPerGame - questionModel.fixedQuestions.count
-        
-        for _ in 1...numberOfRandomQuestions {
+        //get random questions and append to gameQuestions result array
+        for _ in 1...randomQuestions {
             gameQuestions.append(questionModel.getRandomQuestion())
         }
         
@@ -36,16 +50,16 @@ struct GameModel {
     
     func getFinalScore(totalQuestions: Int) -> String {
         var score = ""
-        let gradePercentage = correctQuestions / totalQuestions * 100
+        let gradePercentage = (Double(correctQuestions) / Double(totalQuestions)) * 100.0
         
         switch gradePercentage {
-            case 0...49:
+            case 0..<50:
                 score = "Come on!!! It's all you got?\n"
                 break
-            case 50...69:
+            case 50..<70:
                 score = "Not good enough!!! You need to improve.\n"
                 break
-            case 70...89:
+            case 70..<90:
                 score = "Nice!!! But can you make it to the top?\n"
                 break
             case 90...100:
