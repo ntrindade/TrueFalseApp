@@ -12,6 +12,7 @@
 		97093D411C913506001275BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97093D3F1C913506001275BC /* Main.storyboard */; };
 		97093D431C913506001275BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97093D421C913506001275BC /* Assets.xcassets */; };
 		97093D461C913506001275BC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97093D441C913506001275BC /* LaunchScreen.storyboard */; };
+		E51D6D591D6B3C6400338C92 /* ColorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51D6D581D6B3C6400338C92 /* ColorModel.swift */; };
 		E54957661D64A6DB0088D326 /* Correct.wav in Resources */ = {isa = PBXBuildFile; fileRef = E54957631D64A6DB0088D326 /* Correct.wav */; };
 		E54957671D64A6DB0088D326 /* GameSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = E54957641D64A6DB0088D326 /* GameSound.wav */; };
 		E54957681D64A6DB0088D326 /* Incorrect.wav in Resources */ = {isa = PBXBuildFile; fileRef = E54957651D64A6DB0088D326 /* Incorrect.wav */; };
@@ -32,6 +33,7 @@
 		97093D421C913506001275BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97093D451C913506001275BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97093D471C913506001275BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E51D6D581D6B3C6400338C92 /* ColorModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorModel.swift; sourceTree = "<group>"; };
 		E54957631D64A6DB0088D326 /* Correct.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = Correct.wav; path = Sounds/Correct.wav; sourceTree = "<group>"; };
 		E54957641D64A6DB0088D326 /* GameSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = GameSound.wav; path = Sounds/GameSound.wav; sourceTree = "<group>"; };
 		E54957651D64A6DB0088D326 /* Incorrect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = Incorrect.wav; path = Sounds/Incorrect.wav; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				E594CC821D67A183009DDD93 /* GameModel.swift */,
 				E594CC7E1D668AE5009DDD93 /* QuestionModel.swift */,
 				E594CC841D67A636009DDD93 /* SoundModel.swift */,
+				E51D6D581D6B3C6400338C92 /* ColorModel.swift */,
 			);
 			path = TrueFalseStarter;
 			sourceTree = "<group>";
@@ -187,6 +190,7 @@
 			files = (
 				E594CC7B1D6687E9009DDD93 /* Question.swift in Sources */,
 				E594CC7D1D668811009DDD93 /* Answer.swift in Sources */,
+				E51D6D591D6B3C6400338C92 /* ColorModel.swift in Sources */,
 				97093D3E1C913506001275BC /* ViewController.swift in Sources */,
 				97093D3C1C913506001275BC /* AppDelegate.swift in Sources */,
 				E594CC7F1D668AE5009DDD93 /* QuestionModel.swift in Sources */,
