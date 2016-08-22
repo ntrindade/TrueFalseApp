@@ -10,6 +10,10 @@ struct GameModel {
     let questionModel = QuestionModel()
     let randomNumberModel = RandomNumberModel()
     
+    let selectChallengeTitle = "Select Challenge"
+    let mathQuestionsTitle = "Math Random Questions"
+    let textQuestionsTitle = "Text Fixed Questions"
+    
     let playAgainTitle = "Play again?"
     let nextQuestionTitle = "Next Question"
     
@@ -19,16 +23,26 @@ struct GameModel {
     var correctQuestions = 0
     var indexOfSelectedQuestion = 0
     
-    func getGameQuestions() -> [Question] {
+    func getGameQuestions(challenge: String) -> [Question] {
         
-        // Divides the total number of questions evenly by 2 so it has similar number of fixed and random questions
-        let fixedQuestions = questionsPerGame / 2
-        let randomQuestions = questionsPerGame - fixedQuestions
+        if challenge == textQuestionsTitle {
+            return getFixedQuestions()
+        }
+        
+        if challenge == mathQuestionsTitle {
+            return getRandomQuestions()
+        }
+        
+        //This will never occur
+        return []
+    }
+    
+    func getFixedQuestions() -> [Question] {
+        
         var gameQuestions: [Question] = []
-        
-        // get fixed questions from array
         var indexesAlreadyPicked: [Int] = []
-        for _ in 1...fixedQuestions {
+
+        for _ in 1...questionsPerGame {
             var randomFixedQuestionIndex: Int
             
             // Randomly picks a unique index
@@ -40,8 +54,14 @@ struct GameModel {
             gameQuestions.append(questionModel.fixedQuestions[randomFixedQuestionIndex])
         }
         
-        //get random questions and append to gameQuestions result array
-        for _ in 1...randomQuestions {
+        return gameQuestions
+    }
+    
+    func getRandomQuestions() -> [Question] {
+        
+        var gameQuestions: [Question] = []
+        
+        for _ in 1...questionsPerGame {
             gameQuestions.append(questionModel.getRandomQuestion())
         }
         
@@ -54,7 +74,7 @@ struct GameModel {
         
         switch gradePercentage {
             case 0..<50:
-                score = "Come on!!! It's all you got?\n"
+                score = "Come on!!! This is all you got?\n"
                 break
             case 50..<70:
                 score = "Not good enough!!! You need to improve.\n"

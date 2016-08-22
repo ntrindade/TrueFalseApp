@@ -72,7 +72,7 @@ struct QuestionModel {
                 [
                     Answer(text: "Italy", isCorrect: false),
                     Answer(text: "Brazil", isCorrect: true),
-                    Answer(text: "Argetina", isCorrect: false),
+                    Answer(text: "Argentina", isCorrect: false),
                     Answer(text: "Spain", isCorrect: false),
                 ]),
             Question(text: "Which of the following rivers is longest?",

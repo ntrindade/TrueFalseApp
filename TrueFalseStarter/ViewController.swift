@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         soundModel.loadGameSounds()
-        startGame()
+        selectChallenge()
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,6 +44,17 @@ class ViewController: UIViewController {
     }
     
     @IBAction func checkAnswer(sender: UIButton) {
+        
+        if sender.currentTitle == gameModel.textQuestionsTitle {
+            startGame(gameModel.textQuestionsTitle)
+            return
+        }
+        
+        if sender.currentTitle == gameModel.mathQuestionsTitle {
+            startGame(gameModel.mathQuestionsTitle)
+            return
+        }
+        
         let currentQuestion = gameQuestions[gameModel.indexOfSelectedQuestion]
         let correctAnswer = questionModel.getCorrectAnswer(currentQuestion.answers)
         
@@ -74,7 +85,7 @@ class ViewController: UIViewController {
     
     @IBAction func nextAction(sender: UIButton) {
         if buttonNextAction.currentTitle == gameModel.playAgainTitle {
-            startGame()
+            selectChallenge()
         }
         
         if buttonNextAction.currentTitle == gameModel.nextQuestionTitle {
@@ -83,14 +94,27 @@ class ViewController: UIViewController {
     }
    
     // Helper Methods
-    func startGame() {
+    func selectChallenge() {
+        
+        labelQuestion.text = gameModel.selectChallengeTitle
+        labelResult.text = ""
+        
+        buttonAnswer1.hidden = true
+        setButtonWithTitle(buttonAnswer2, title: gameModel.textQuestionsTitle)
+        setButtonWithTitle(buttonAnswer3, title: gameModel.mathQuestionsTitle)
+        buttonAnswer4.hidden = true
+        
+        buttonNextAction.hidden = true
+    }
+    
+    func startGame(challenge: String) {
         
         soundModel.playGameStartSound()
         
         gameModel.questionsPerGame = questionsPerGame
         gameModel.correctQuestions = 0
         
-        gameQuestions = gameModel.getGameQuestions()
+        gameQuestions = gameModel.getGameQuestions(challenge)
         buttonNextAction.setTitle(gameModel.nextQuestionTitle, forState: UIControlState.Normal)
         
         displayQuestion()
@@ -117,25 +141,25 @@ class ViewController: UIViewController {
         labelResult.text = ""
         
         if question.answers.count > 0 {
-            setButtonWithAnswer(buttonAnswer1, title: question.answers[0].text)
+            setButtonWithTitle(buttonAnswer1, title: question.answers[0].text)
         } else {
             buttonAnswer1.hidden = true
         }
  
         if question.answers.count > 1 {
-            setButtonWithAnswer(buttonAnswer2, title: question.answers[1].text)
+            setButtonWithTitle(buttonAnswer2, title: question.answers[1].text)
         } else {
             buttonAnswer2.hidden = true
         }
         
         if question.answers.count > 2 {
-            setButtonWithAnswer(buttonAnswer3, title: question.answers[2].text)
+            setButtonWithTitle(buttonAnswer3, title: question.answers[2].text)
         } else {
             buttonAnswer3.hidden = true
         }
         
         if question.answers.count > 3 {
-            setButtonWithAnswer(buttonAnswer4, title: question.answers[3].text)
+            setButtonWithTitle(buttonAnswer4, title: question.answers[3].text)
         } else {
             buttonAnswer4.hidden = true
         }
@@ -186,7 +210,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func setButtonWithAnswer(button: UIButton, title: String) {
+    func setButtonWithTitle(button: UIButton, title: String) {
         button.hidden = false
         button.enabled = true
         button.backgroundColor = colorModel.enabledBackgroundColor
