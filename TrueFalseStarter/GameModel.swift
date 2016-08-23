@@ -80,7 +80,7 @@ struct GameModel {
                 score = "Not good enough!!! You need to improve.\n"
                 break
             case 70..<90:
-                score = "Nice!!! But can you make it to the top?\n"
+                score = "Nice!!! Can you make it to the top?\n"
                 break
             case 90...100:
                 score = "Wow!!! What a superstar you are.\n"

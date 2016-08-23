@@ -137,19 +137,11 @@ class ViewController: UIViewController {
     
     func displayQuestionWithTimeout() {
         
-        timeoutBlocker = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) {
-            self.checkAnswer(self.buttonNextAction)
-        }
-        
-        timeoutDisplay = gameModel.timeoutQuestionInSeconds
-        labelResult.textColor = colorModel.enabledTitleColor
-        timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
-        
         gameModel.indexOfSelectedQuestion = randomNumberModel.getWithUpperBound(gameQuestions.count)
         let question = gameQuestions[gameModel.indexOfSelectedQuestion]
         
         labelQuestion.text = question.text
-        labelResult.text = ""
+        labelResult.text = "00:\(String(format: "%02d", gameModel.timeoutQuestionInSeconds))"
         
         if question.answers.count > 0 {
             setButtonWithTitle(buttonAnswer1, title: question.answers[0].text)
@@ -177,7 +169,11 @@ class ViewController: UIViewController {
         
         buttonNextAction.hidden = true
         
-        timeoutQuestion(seconds: gameModel.timeoutQuestionInSeconds)
+        timeoutBlocker = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) {
+            self.checkAnswer(self.buttonNextAction)
+        }
+        
+        setTimeoutOnQuestion()
     }
     
     func displayScore() {
@@ -192,16 +188,6 @@ class ViewController: UIViewController {
         
         labelResult.text = String()
         labelQuestion.text = gameModel.getFinalScore(questionsPerGame)
-    }   
-
-    func timeoutQuestion(seconds seconds: Int) {
-        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-        let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-        // Calculates a time value to execute the method given current time and delay
-        let dispatchTime = dispatch_time(DISPATCH_TIME_NOW, delay)
-        
-        // Executes the nextRound method at the dispatch time on the main queue
-        dispatch_after(dispatchTime, dispatch_get_main_queue(), timeoutBlocker!)
     }
 
     func disableAnswerButtons(buttons: [UIButton], answerButton: UIButton, correctAnswer: Answer){
@@ -241,11 +227,30 @@ class ViewController: UIViewController {
         soundModel.playIncorrectSound()
     }
     
+    func setTimeoutOnQuestion() {
+        timeoutDisplay = gameModel.timeoutQuestionInSeconds
+        labelResult.textColor = colorModel.enabledTitleColor
+        let timerUpdateInSeconds = 1.0
+        timer = NSTimer.scheduledTimerWithTimeInterval(timerUpdateInSeconds, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
+        
+        timeoutQuestion(seconds: gameModel.timeoutQuestionInSeconds)
+    }
+    
     func updateTimer() {
-        if timeoutDisplay > 0 {
+        if timeoutDisplay >= 0 {
             labelResult.text = "00:\(String(format: "%02d", timeoutDisplay))"
             timeoutDisplay -= 1
         }
+    }
+    
+    func timeoutQuestion(seconds seconds: Int) {
+        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
+        let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
+        // Calculates a time value to execute the method given current time and delay
+        let dispatchTime = dispatch_time(DISPATCH_TIME_NOW, delay)
+        
+        // Executes the nextRound method at the dispatch time on the main queue
+        dispatch_after(dispatchTime, dispatch_get_main_queue(), timeoutBlocker!)
     }
 }
 
