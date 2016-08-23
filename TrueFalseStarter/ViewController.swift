@@ -22,6 +22,8 @@ class ViewController: UIViewController {
     var gameQuestions: [Question] = []
     
     var timeoutBlocker: dispatch_block_t?
+    var timeoutDisplay: Int = 0
+    var timer: NSTimer?
     
     @IBOutlet weak var labelQuestion: UILabel!
     @IBOutlet weak var labelResult: UILabel!
@@ -53,6 +55,11 @@ class ViewController: UIViewController {
         if sender.currentTitle == gameModel.mathQuestionsTitle {
             startGame(gameModel.mathQuestionsTitle)
             return
+        }
+        
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
         }
         
         let currentQuestion = gameQuestions[gameModel.indexOfSelectedQuestion]
@@ -117,22 +124,26 @@ class ViewController: UIViewController {
         gameQuestions = gameModel.getGameQuestions(challenge)
         buttonNextAction.setTitle(gameModel.nextQuestionTitle, forState: UIControlState.Normal)
         
-        displayQuestion()
+        displayQuestionWithTimeout()
     }
     
     func nextQuestion() {
         if gameQuestions.count == 0 {
             displayScore()
         } else {
-            displayQuestion()
+            displayQuestionWithTimeout()
         }
     }
     
-    func displayQuestion() {
+    func displayQuestionWithTimeout() {
         
         timeoutBlocker = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) {
             self.checkAnswer(self.buttonNextAction)
         }
+        
+        timeoutDisplay = gameModel.timeoutQuestionInSeconds
+        labelResult.textColor = colorModel.enabledTitleColor
+        timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
         
         gameModel.indexOfSelectedQuestion = randomNumberModel.getWithUpperBound(gameQuestions.count)
         let question = gameQuestions[gameModel.indexOfSelectedQuestion]
@@ -165,7 +176,7 @@ class ViewController: UIViewController {
         }
         
         buttonNextAction.hidden = true
-
+        
         timeoutQuestion(seconds: gameModel.timeoutQuestionInSeconds)
     }
     
@@ -228,6 +239,13 @@ class ViewController: UIViewController {
         labelResult.text = message
         labelResult.textColor = colorModel.incorrectAnswerHeaderColor
         soundModel.playIncorrectSound()
+    }
+    
+    func updateTimer() {
+        if timeoutDisplay > 0 {
+            labelResult.text = "00:\(String(format: "%02d", timeoutDisplay))"
+            timeoutDisplay -= 1
+        }
     }
 }
 
