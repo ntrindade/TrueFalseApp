@@ -173,7 +173,7 @@ struct QuestionModel {
         return question
     }
     
-    func getRandomAnswers(numberOfAnswers: Int, correctAnswer: Int) -> [Answer] {
+    func getRandomAnswers(_ numberOfAnswers: Int, correctAnswer: Int) -> [Answer] {
         
         var randomAnswers: [Answer] = []
         
@@ -210,7 +210,7 @@ struct QuestionModel {
         return randomAnswers
     }
     
-    func getCorrectAnswer(answers: [Answer]) -> Answer? {
+    func getCorrectAnswer(_ answers: [Answer]) -> Answer? {
         
         for answer in answers {
             if answer.isCorrect == true {

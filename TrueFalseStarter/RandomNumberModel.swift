@@ -10,17 +10,17 @@ import GameplayKit
 
 struct RandomNumberModel {
     
-    func getWithUpperBound(upperBound: Int) -> Int {
-        return GKRandomSource.sharedRandom().nextIntWithUpperBound(upperBound)
+    func getWithUpperBound(_ upperBound: Int) -> Int {
+        return GKRandomSource.sharedRandom().nextInt(upperBound: upperBound)
     }
     
-    func getWithUpperBoundAndRestrictions(upperBound upperBound: Int, restrictions: [Int]) -> Int {
+    func getWithUpperBoundAndRestrictions(upperBound: Int, restrictions: [Int]) -> Int {
         
         let lowerBoundLimit = -1
         var randomNumber: Int = -1
         
         repeat {
-            let tempNumber: Int = GKRandomSource.sharedRandom().nextIntWithUpperBound(upperBound)
+            let tempNumber: Int = GKRandomSource.sharedRandom().nextInt(upperBound: upperBound)
             if restrictions.contains(tempNumber) {
                 continue
             }
@@ -31,7 +31,7 @@ struct RandomNumberModel {
         return randomNumber
     }
     
-    func getWithLowerAndUpperBound(lowerBound lowerBound: Int, upperBound: Int) -> Int {
+    func getWithLowerAndUpperBound(lowerBound: Int, upperBound: Int) -> Int {
         
         let lowerBoundLimit = lowerBound-1
         let upperBoundLimit = upperBound+1
@@ -39,7 +39,7 @@ struct RandomNumberModel {
         var randomNumber = lowerBoundLimit
         
         repeat {
-            let tempNumber: Int = GKRandomSource.sharedRandom().nextIntWithUpperBound(upperBoundLimit)
+            let tempNumber: Int = GKRandomSource.sharedRandom().nextInt(upperBound: upperBoundLimit)
             if tempNumber < lowerBound {
                 continue
             }
@@ -50,7 +50,7 @@ struct RandomNumberModel {
         return randomNumber
     }
     
-    func getWithLowerUpperBoundAndRestrictions(lowerBound lowerBound: Int, upperBound: Int, restrictions: [Int]) -> Int {
+    func getWithLowerUpperBoundAndRestrictions(lowerBound: Int, upperBound: Int, restrictions: [Int]) -> Int {
         
         let lowerBoundLimit = lowerBound-1
         let upperBoundLimit = upperBound+1
@@ -58,7 +58,7 @@ struct RandomNumberModel {
         var randomNumber = lowerBoundLimit
         
         repeat {
-            let tempNumber: Int = GKRandomSource.sharedRandom().nextIntWithUpperBound(upperBoundLimit)
+            let tempNumber: Int = GKRandomSource.sharedRandom().nextInt(upperBound: upperBoundLimit)
             if tempNumber < lowerBound || restrictions.contains(tempNumber) {
                 continue
             }

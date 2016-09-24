@@ -23,7 +23,7 @@ struct GameModel {
     var correctQuestions = 0
     var indexOfSelectedQuestion = 0
     
-    func getGameQuestions(challenge: String) -> [Question] {
+    func getGameQuestions(_ challenge: String) -> [Question] {
         
         if challenge == textQuestionsTitle {
             return getFixedQuestions()
@@ -68,7 +68,7 @@ struct GameModel {
         return gameQuestions
     }
     
-    func getFinalScore(totalQuestions: Int) -> String {
+    func getFinalScore(_ totalQuestions: Int) -> String {
         var score = ""
         let gradePercentage = (Double(correctQuestions) / Double(totalQuestions)) * 100.0
         
